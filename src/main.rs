@@ -82,30 +82,28 @@ fn main() -> std::io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn test_preamble_length(packed: &Vec<u8>, starts_with: &[u8], length: usize) {
-        assert!(packed.starts_with(starts_with));
-        assert_eq!(packed.len(), length);
-    }
 
     #[test]
     fn test_cmnd_pack() {
-        test_preamble_length(&pack_cmnd("hello/world"), b"CMND\0hello/world\0", 505);
+        let packed = &pack_cmnd("hello/world");
+        let expected_data = b"CMND\0hello/world\0";
+        assert!(packed.starts_with(expected_data));
+        assert_eq!(packed.len(), 505);
     }
 
     #[test]
     fn test_dref_pack() {
-        test_preamble_length(
-            &pack_dref("hello/world", 1f32),
-            b"DREF\0\0\0\x80\x3f\x68\x65\x6c\x6c\x6f\x2f\x77\x6f\x72\x6c\x64\0",
-            509,
-        );
+        let packed = pack_dref("hello/world", 1f32);
+        let expected_data = b"DREF\0\0\0\x80\x3fhello/world\0";
+        assert!(packed.starts_with(expected_data));
+        assert_eq!(packed.len(), 509);
     }
+
     #[test]
     fn test_rref_pack() {
-        test_preamble_length(
-            &pack_rref("hello/world", 7, 42),
-            b"RREF\0\x07\0\0\0\x2a\0\0\0hello/world\0",
-            413,
-        );
+        let packed = pack_rref("hello/world", 7, 42);
+        let expected_data = b"RREF\0\x07\0\0\0\x2a\0\0\0hello/world\0";
+        assert!(packed.starts_with(expected_data));
+        assert_eq!(packed.len(), 413);
     }
 }
